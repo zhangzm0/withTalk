@@ -10,7 +10,7 @@ plugins {
     // 与 Kotlin 1.9.10 配套
     kotlin("plugin.serialization") version "1.9.10"
     // KSP 1.9.10-1.0.13 是最后一组支持 Java 8 的版本
-    id("com.google.devtools.ksp") version "2.0.0-1.0.21"
+    id("com.google.devtools.ksp") version "1.9.10-1.0.13"
 }
 
 val localProperties = Properties().apply {
