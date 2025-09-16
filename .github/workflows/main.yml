@@ -21,7 +21,7 @@ jobs:
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: '8'
+        java-version: '17'
 
     # 3. 缓存 Gradle 依赖 & 构建缓存，加速后续运行
     - name: Cache Gradle
