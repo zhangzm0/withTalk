@@ -59,6 +59,12 @@ android {
     }
     kotlinOptions {
         jvmTarget = "1.8"
+        kotlin {
+    compilerOptions {
+        languageVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
+        apiVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
+    }
+}
     }
     buildFeatures {
         compose = true
