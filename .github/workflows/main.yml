@@ -17,7 +17,7 @@ jobs:
 
       - run: flutter --version          # 确认版本
       - run: flutter pub get
-      - run: flutter build apk --release --target-platform android-arm
+      - run: flutter build apk --debug --target-platform android-arm
 
       - uses: actions/upload-artifact@v4
         with:
