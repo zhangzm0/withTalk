@@ -1,61 +1,45 @@
-name: Build and Release for Android 5 (32-bit)
+name: Build Android 32-bit APK for Android 5+
 
 on:
   push:
-    tags:
-      - "v*"
-
-permissions:
-  contents: write
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
 
 jobs:
-  build-apk:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Clone repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Setup JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: "zulu"
-          java-version: "11"  # 改为JDK 11以更好兼容Android 5
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu'
+        java-version: '11'
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: 3.24.5
-          channel: stable
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.13.9' # 使用一个支持Android 5的Flutter版本
+        channel: 'stable'
 
-      - name: Install Android SDK components for Android 5
-        run: |
-          echo "y" | sdkmanager "platforms;android-21"  # Android 5.0 (API 21)
-          echo "y" | sdkmanager "build-tools;30.0.3"
+    - name: Install dependencies
+      run: flutter pub get
 
-      - name: Setup signing
-        run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
-          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
-          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
-          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
-          echo "storeFile=keystore.jks" >> android/key.properties
+    - name: Verify Android SDK components
+      run: |
+        echo "y" | sdkmanager "platforms;android-21" # Android 5.0 (API 21)
+        echo "y" | sdkmanager "build-tools;30.0.3"
 
-      - name: Build for 32-bit architecture
-        run: |
-          flutter pub get
-          flutter build apk --release --target-platform=android-arm  # 只构建32位架构
-
-      - name: ChangeLog
-        id: changelog
-        run: |
-          echo "latest<<EOF" >> $GITHUB_OUTPUT
-          awk '/^[0-9]/{i++}i==1' CHANGELOG | sed '${/^$/d}' >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-      - name: Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: build/app/outputs/flutter-apk/app-release.apk  # 只上传32位APK
-          body: ${{ steps.changelog.outputs.latest }}
+    - name: Build APK for armeabi-v7a (32-bit)
+      run: |
+        flutter build apk --release --target-platform=android-arm
+        
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: app-arm32-release
+        path: build/app/outputs/flutter-apk/app-release.apk
