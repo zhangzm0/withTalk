@@ -1,0 +1,40 @@
+# Miscellaneous
+*.log
+*.pyc
+*.swp
+*.class
+.history
+.DS_Store
+.svn/
+.atom/
+.buildlog/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.flutter-plugins
+devtools_options.yaml
+.flutter-plugins-dependencies
+.pub/
+/build/
+.pub-cache/
+.dart_tool/
+
+# Obfuscation related
+app.*.map.json
+
+# Symbolication related
+app.*.symbols
+
+# Android Studio related
+/android/app/debug
+/android/app/profile
+/android/app/release
