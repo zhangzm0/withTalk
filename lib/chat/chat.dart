@@ -19,6 +19,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:animate_do/animate_do.dart';
 
+import 'dart:io';          // 新增
 import 'input.dart';
 import 'message.dart';
 import 'current.dart';
@@ -79,7 +80,7 @@ class _ChatPageState extends ConsumerState<ChatPage> {
   bool get _isNarrow => MediaQuery.of(context).size.width < 600;
 
   /* 供 InputWidget 调用，自动滑到输入页 */
-  void _focusInput() {
+  void focusInput() {
     if (_isNarrow && (_pageController.page ?? 0) < 0.5) {
       _pageController.animateToPage(1,
           duration: const Duration(milliseconds: 300), curve: Curves.easeOut);

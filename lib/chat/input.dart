@@ -53,7 +53,7 @@ void initState() {
   /* 新增：获得焦点时通知 ChatPage 滑过去 */
   InputWidget.focusNode.addListener(() {
     if (InputWidget.focusNode.hasFocus) {
-      chatPageKey.currentState?._focusInput();
+      chatPageKey.currentState?.focusInput();
     }
   });
 
