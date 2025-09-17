@@ -28,6 +28,16 @@ import "package:image_picker/image_picker.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:flutter_image_compress/flutter_image_compress.dart";
 
+class InputPage extends StatelessWidget {
+  const InputPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // 全屏给内容，安全区留给键盘
+    return const SafeArea(child: InputWidget());
+  }
+}
+
 class InputWidget extends ConsumerStatefulWidget {
   static final FocusNode focusNode = FocusNode();
 

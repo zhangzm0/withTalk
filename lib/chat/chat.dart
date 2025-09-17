@@ -91,7 +91,10 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     super.dispose();
   }
 
-/* 只贴改动的 build 方法，其余保持原样 */
+// 把原来在 _ChatPageState 里出现的
+//   child: const InputWidget(),
+// 删掉，换成浮动按钮跳 InputPage：
+
 @override
 Widget build(BuildContext context) {
   return Scaffold(
@@ -100,7 +103,7 @@ Widget build(BuildContext context) {
     body: Column(
       children: [
         Expanded(child: _buildMessageList()),
-        /* 去掉原来的 InputWidget，改成一个浮动按钮 */
+        // ← 原来 InputWidget 已移除
       ],
     ),
     floatingActionButton: FloatingActionButton(
@@ -112,6 +115,7 @@ Widget build(BuildContext context) {
     ),
   );
 }
+
 
 
   AppBar _buildAppBar() {

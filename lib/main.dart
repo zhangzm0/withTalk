@@ -15,10 +15,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:chatbot/config.dart';
 import 'package:chatbot/gen/l10n.dart';
 import 'package:chatbot/chat/chat.dart';
-import 'package:chatbot/chat/input.dart';
+import 'package:chatbot/chat/current.dart'; // ← 新增，为了 InputPage
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,10 +49,9 @@ class MyApp extends StatelessWidget {
   }
 }
 
-/* ========= 两屏 PageView ========= */
+/* ---------- 两屏滑动 ---------- */
 class HomePager extends StatefulWidget {
   const HomePager({super.key});
-
   @override
   State<HomePager> createState() => _HomePagerState();
 }
@@ -66,7 +66,6 @@ class _HomePagerState extends State<HomePager> {
     super.dispose();
   }
 
-  /* 底部小圆点 */
   Widget _dot(bool active) => AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -85,10 +84,7 @@ class _HomePagerState extends State<HomePager> {
     return Scaffold(
       /* 输入屏不显示 AppBar */
       appBar: _page == 0
-          ? AppBar(
-              title: Text(S.of(context).chat),
-              centerTitle: true,
-            )
+          ? AppBar(title: const Text('ChatBot'), centerTitle: true)
           : null,
       body: Column(
         children: [
@@ -97,20 +93,16 @@ class _HomePagerState extends State<HomePager> {
               controller: _ctrl,
               onPageChanged: (i) => setState(() => _page = i),
               children: const [
-                ChatPage(),  // 原聊天列表
-                InputPage(), // 新输入页
+                ChatPage(),  // 0
+                InputPage(), // 1
               ],
             ),
           ),
-          /* 底部指示器 */
           SizedBox(
             height: 36,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _dot(_page == 0),
-                _dot(_page == 1),
-              ],
+              children: [_dot(_page == 0), _dot(_page == 1)],
             ),
           ),
         ],
