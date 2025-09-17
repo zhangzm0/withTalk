@@ -91,19 +91,28 @@ class _ChatPageState extends ConsumerState<ChatPage> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(),
-      drawer: Drawer(
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.zero,
-        ),
-        child: SafeArea(child: _buildDrawer()),
+/* 只贴改动的 build 方法，其余保持原样 */
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: _buildAppBar(),
+    drawer: Drawer(child: SafeArea(child: _buildDrawer())),
+    body: Column(
+      children: [
+        Expanded(child: _buildMessageList()),
+        /* 去掉原来的 InputWidget，改成一个浮动按钮 */
+      ],
+    ),
+    floatingActionButton: FloatingActionButton(
+      mini: true,
+      onPressed: () => Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const InputPage()),
       ),
-      body: _buildBody(),
-    );
-  }
+      child: const Icon(Icons.edit),
+    ),
+  );
+}
+
 
   AppBar _buildAppBar() {
     return AppBar(
