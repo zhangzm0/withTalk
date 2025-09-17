@@ -1,4 +1,4 @@
-name: Build Flutter APK
+name: Build 32-bit APK
 
 on:
   push:
@@ -7,24 +7,19 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.6' # 使用你项目兼容的版本
+          flutter-version: '3.24.3'   # Dart 3.5+ 所在版本
+          channel: stable
 
-      - name: Install dependencies
-        run: flutter pub get
+      - run: flutter --version          # 确认版本
+      - run: flutter pub get
+      - run: flutter build apk --release --target-platform android-arm
 
-      - name: Build APK (32-bit only)
-        run: flutter build apk --release --target-platform android-arm
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: release-apk-arm32
+          name: app-release-32bit
           path: build/app/outputs/flutter-apk/app-release.apk
