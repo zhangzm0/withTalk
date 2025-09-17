@@ -20,16 +20,23 @@ jobs:
         distribution: 'zulu'
         java-version: '11'
 
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.16.9' # 使用一个支持Android 5的稳定版本
+        flutter-version: '3.16.9'
         channel: 'stable'
+        cache: true
+        cache-key: flutter-packages
+        cache-path: ${{ github.workspace }}/.pub-cache
 
-    - name: Install Android SDK components
+    - name: Install required Android platforms and build tools
       run: |
-        yes | sdkmanager "platforms;android-21"
-        yes | sdkmanager "build-tools;33.0.2" # 使用较新的构建工具
+        echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-21"
+        echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "build-tools;33.0.2"
+        echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-33"
 
     - name: Flutter doctor
       run: flutter doctor -v
@@ -39,7 +46,7 @@ jobs:
 
     - name: Build APK for armeabi-v7a (32-bit)
       run: |
-        flutter build apk --release --target-platform=android-arm
+        flutter build apk --release --target-platform=android-arm --verbose
         
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4
