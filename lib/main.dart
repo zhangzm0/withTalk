@@ -15,20 +15,19 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:chatbot/gen/l10n.dart';
 import 'package:chatbot/config.dart';
+import 'package:chatbot/gen/l10n.dart';
 import 'package:chatbot/chat/chat.dart';
-import 'package:chatbot/chat/input.dart';   // 新建
+import 'package:chatbot/chat/input.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Config.init();
-  runApp(const ProviderScope(child: App()));
+  runApp(const ProviderScope(child: MyApp()));
 }
 
-class App extends StatelessWidget {
-  const App({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -44,12 +43,12 @@ class App extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: S.delegate.supportedLocales,
-      home: const HomePager(),          // ← 换成两屏滑动
+      home: const HomePager(),
     );
   }
 }
 
-/* ========== 左右滑动容器 ========== */
+/* ========= 两屏 PageView ========= */
 class HomePager extends StatefulWidget {
   const HomePager({super.key});
 
@@ -67,46 +66,54 @@ class _HomePagerState extends State<HomePager> {
     super.dispose();
   }
 
+  /* 底部小圆点 */
+  Widget _dot(bool active) => AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        width: 8,
+        height: 8,
+        decoration: BoxDecoration(
+          color: active
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.outline,
+          borderRadius: BorderRadius.circular(4),
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       /* 输入屏不显示 AppBar */
-      appBar: _page == 1
-          ? null
-          : AppBar(
-              title: Text(S.of(context).new_chat),
+      appBar: _page == 0
+          ? AppBar(
+              title: Text(S.of(context).chat),
               centerTitle: true,
+            )
+          : null,
+      body: Column(
+        children: [
+          Expanded(
+            child: PageView(
+              controller: _ctrl,
+              onPageChanged: (i) => setState(() => _page = i),
+              children: const [
+                ChatPage(),  // 原聊天列表
+                InputPage(), // 新输入页
+              ],
             ),
-      body: PageView(
-        controller: _ctrl,
-        onPageChanged: (i) => setState(() => _page = i),
-        children: const [
-          ChatPage(),   // 原聊天列表
-          InputPage(),  // 新建输入页
-        ],
-      ),
-      /* 底部小点指示器，可删 */
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(2, (i) {
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                width: _page == i ? 24 : 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  color: _page == i
-                      ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).colorScheme.outlineVariant,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              );
-            }),
           ),
-        ),
+          /* 底部指示器 */
+          SizedBox(
+            height: 36,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _dot(_page == 0),
+                _dot(_page == 1),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
