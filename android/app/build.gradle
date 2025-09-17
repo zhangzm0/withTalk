@@ -15,12 +15,12 @@ android {
     compileSdk = flutter.compileSdkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11
+        jvmTarget = JavaVersion.VERSION_17
     }
 
     defaultConfig {
@@ -29,18 +29,12 @@ android {
         versionName = flutter.versionName
         targetSdk = flutter.targetSdkVersion
         applicationId = "cc.arthur63.chatbot"
-    }
-
-
-    // 指定构建32位版本
-    splits {
-        abi {
-            enable true
-            reset()
-            include 'armeabi-v7a' // 只构建32位版本
-            universalApk false
+        ndk {
+            abiFilters 'armeabi-v7a' // 仅构建 32 位
         }
     }
+
+
 
     signingConfigs {
         release {

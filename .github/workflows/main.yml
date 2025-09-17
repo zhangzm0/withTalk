@@ -1,9 +1,7 @@
-name: Build Android 32-bit APK for Android 5+
+name: Build Flutter APK
 
 on:
   push:
-    branches: [ main, master ]
-  pull_request:
     branches: [ main, master ]
 
 jobs:
@@ -11,45 +9,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Java
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'zulu'
-        java-version: '11'
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.6' # 使用你项目兼容的版本
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
+      - name: Install dependencies
+        run: flutter pub get
 
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.16.9'
-        channel: 'stable'
-        cache: true
-        cache-key: flutter-packages
-        cache-path: ${{ github.workspace }}/.pub-cache
+      - name: Build APK (32-bit only)
+        run: flutter build apk --release --target-platform android-arm
 
-    - name: Install required Android platforms and build tools
-      run: |
-        echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-21"
-        echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "build-tools;33.0.2"
-        echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-33"
-
-    - name: Flutter doctor
-      run: flutter doctor -v
-
-    - name: Install dependencies
-      run: flutter pub get
-
-    - name: Build APK for armeabi-v7a (32-bit)
-      run: |
-        flutter build apk --release --target-platform=android-arm --verbose
-        
-    - name: Upload APK artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: app-arm32-release
-        path: build/app/outputs/flutter-apk/app-release.apk
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apk-arm32
+          path: build/app/outputs/flutter-apk/app-release.apk
