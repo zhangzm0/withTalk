@@ -1,0 +1,71 @@
+name: Build and Release
+
+on:
+  push:         # 任何 push 都触发
+    branches:
+      - '**'    # 所有分支
+  workflow_dispatch:   # 保留手动触发入口（可选）
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup JDK17
+        uses: actions/setup-java@v4
+        with:
+          distribution: "zulu"
+          java-version: "17"
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.24.5
+
+      - name: Setup signing
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
+          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
+          echo "storeFile=keystore.jks" >> android/key.properties
+
+      - name: Build
+        run: |
+          flutter pub get
+          # 一次性打出 3 个 ABI 包
+          flutter build apk --split-per-abi --target-platform android-arm,android-arm64,android-x64
+
+      - name: Generate checksums
+        run: |
+          cd build/app/outputs/flutter-apk
+          sha1sum app-armeabi-v7a-release.apk > app-armeabi-v7a-release.apk.sha1
+          sha1sum app-arm64-v8a-release.apk   > app-arm64-v8a-release.apk.sha1
+          sha1sum app-x86_64-release.apk      > app-x86_64-release.apk.sha1
+
+      - name: ChangeLog
+        id: changelog
+        run: |
+          echo "latest<<EOF" >> $GITHUB_OUTPUT
+          awk '/^[0-9]/{i++}i==1' CHANGELOG | sed '${/^$/d}' >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}   # 如果 push 的是 tag，仍可用 tag 名
+          files: |
+            build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+            build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk.sha1
+            build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+            build/app/outputs/flutter-apk/app-arm64-v8a-release.apk.sha1
+            build/app/outputs/flutter-apk/app-x86_64-release.apk
+            build/app/outputs/flutter-apk/app-x86_64-release.apk.sha1
+          body: ${{ steps.changelog.outputs.latest }}

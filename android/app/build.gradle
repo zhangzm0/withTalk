@@ -29,12 +29,7 @@ android {
         versionName = flutter.versionName
         targetSdk = flutter.targetSdkVersion
         applicationId = "cc.arthur63.chatbot"
-        ndk {
-            abiFilters 'armeabi-v7a' // 仅构建 32 位
-        }
     }
-
-
 
     signingConfigs {
         release {
