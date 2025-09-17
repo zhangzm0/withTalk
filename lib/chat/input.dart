@@ -28,16 +28,6 @@ import "package:image_picker/image_picker.dart";
 import "package:flutter_riverpod/flutter_riverpod.dart";
 import "package:flutter_image_compress/flutter_image_compress.dart";
 
-class InputPage extends StatelessWidget {
-  const InputPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    // 全屏给内容，安全区留给键盘
-    return const SafeArea(child: InputWidget());
-  }
-}
-
 class InputWidget extends ConsumerStatefulWidget {
   static final FocusNode focusNode = FocusNode();
 
@@ -56,17 +46,24 @@ class _InputWidgetState extends ConsumerState<InputWidget> {
   static final List<_Image> _images = [];
   final TextEditingController _inputCtrl = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    _inputCtrl.addListener(() {
-      final text = _inputCtrl.text;
-      if (_lastText.isEmpty ^ text.isEmpty) {
-        setState(() {});
-      }
-      _lastText = text;
-    });
-  }
+  
+@override
+void initState() {
+  super.initState();
+  /* 新增：获得焦点时通知 ChatPage 滑过去 */
+  InputWidget.focusNode.addListener(() {
+    if (InputWidget.focusNode.hasFocus) {
+      chatPageKey.currentState?._focusInput();
+    }
+  });
+
+  _inputCtrl.addListener(() {
+    final text = _inputCtrl.text;
+    if (_lastText.isEmpty ^ text.isEmpty) setState(() {});
+    _lastText = text;
+  });
+}
+
 
   @override
   void dispose() {

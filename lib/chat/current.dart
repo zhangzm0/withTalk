@@ -124,4 +124,3 @@ enum ChatStatus {
   bool get isResponding => this == ChatStatus.responding;
 }
 
-export 'input.dart' show InputPage;   // ← 新增，放在文件末尾
