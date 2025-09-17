@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'input.dart';
 
-/// 输入页：无 AppBar，专为小屏准备
+/// 输入页：无 AppBar，全屏输入
 class InputPage extends StatelessWidget {
   const InputPage({super.key});
 
@@ -10,12 +10,8 @@ class InputPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SafeArea(
-        child: Column(
-          children: const [
-            Expanded(child: SizedBox()), // 顶部留白，可删
-            InputWidget(),
-            SizedBox(height: 8),
-          ],
+        child: SizedBox.expand(
+          child: InputWidget(), // 占满整个可用区域
         ),
       ),
     );
