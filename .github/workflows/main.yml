@@ -3,7 +3,7 @@ name: Build and Release for Android 5 (32-bit)
 on:
   push:
     tags:
-      - "*"
+      - "v*"
 
 permissions:
   contents: write
