@@ -12,10 +12,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Setup Java
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         distribution: 'zulu'
         java-version: '11'
@@ -23,23 +23,26 @@ jobs:
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.13.9' # 使用一个支持Android 5的Flutter版本
+        flutter-version: '3.16.9' # 使用一个支持Android 5的稳定版本
         channel: 'stable'
+
+    - name: Install Android SDK components
+      run: |
+        yes | sdkmanager "platforms;android-21"
+        yes | sdkmanager "build-tools;33.0.2" # 使用较新的构建工具
+
+    - name: Flutter doctor
+      run: flutter doctor -v
 
     - name: Install dependencies
       run: flutter pub get
-
-    - name: Verify Android SDK components
-      run: |
-        echo "y" | sdkmanager "platforms;android-21" # Android 5.0 (API 21)
-        echo "y" | sdkmanager "build-tools;30.0.3"
 
     - name: Build APK for armeabi-v7a (32-bit)
       run: |
         flutter build apk --release --target-platform=android-arm
         
     - name: Upload APK artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: app-arm32-release
         path: build/app/outputs/flutter-apk/app-release.apk
